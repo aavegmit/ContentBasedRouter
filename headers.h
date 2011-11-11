@@ -34,6 +34,21 @@
 #define SRC_ETHER_ADDR "00:04:23:c5:d7:8e"
 #define DST_ETHER_ADDR "00:04:23:c7:a4:be"
 
+#define INTERFACE_1 "eth0"
+#define INTERFACE_2 "eth1"
+#define INTERFACE_3 "eth2"
+#define INTERFACE_4 "eth4"
+
+#define RTR_ETHER_1 "00:0e:0c:68:a6:fa"
+#define RTR_ETHER_2 "00:04:23:ae:bf:92"
+#define RTR_ETHER_3 "00:04:23:ae:bf:93"
+#define RTR_ETHER_4 "00:11:43:d6:d6:18"
+
+#define NODE0_ETHER "00:04:23:ae:c8:5a"
+#define NODE1_ETHER "00:0e:0c:66:89:82"
+#define NODE2_ETHER "00:04:23:ae:d1:4c"
+#define NODE3_ETHER "00:04:23:ae:cc:32"
+
 struct sniff_ethernet {
     u_char  ether_dhost[ETHER_ADDR_LEN];    /* destination host address */
     u_char  ether_shost[ETHER_ADDR_LEN];    /* source host address */

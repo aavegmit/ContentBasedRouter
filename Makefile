@@ -1,4 +1,4 @@
-TARGETS=server client
+TARGETS=server client router
 all: ${TARGETS}
 
 server: server.o fileIO.o
@@ -6,6 +6,9 @@ server: server.o fileIO.o
 
 client: client.o fileIO.o
 	g++ -o client client.o fileIO.o -D_REETRANT -lpthread
+
+router: router.o
+	g++ -o router router.o -D_REETRANT -lpthread
 
 server.o: server.c
 	g++ -c -g server.c  -D_REETRANT -lpthread
@@ -15,6 +18,9 @@ fileIO.o: fileIO.cc
 
 client.o: client.c
 	g++ -c -g client.c  -D_REETRANT -lpthread
+
+router.o: router.c
+	g++ -c -g router.c  -D_REETRANT -lpthread
 
 clean:
 	rm -f *.o server client
