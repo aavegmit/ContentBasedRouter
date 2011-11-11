@@ -19,7 +19,10 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include<linux/if_packet.h>
+#include <netinet/ether.h>
 #define FRAME_LEN 54
+#define SRC_ETHER_ADDR "00:04:23:c5:d7:8e"
+#define DST_ETHER_ADDR "00:04:23:c7:a4:be"
 
 struct sniff_ethernet {
     u_char  ether_dhost[ETHER_ADDR_LEN];    /* destination host address */

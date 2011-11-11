@@ -39,9 +39,10 @@ int BindRawSocketToInterface(char *device, int rawsock, int protocol)
 int main(int argc, char **argv){
 
     unsigned char* buffer, content[100] ;
-    int length, s;
+    int length, s, ethhdr_len;
     struct ifreq ethreq;
     struct frame *header ;
+    struct sniff_ethernet *ethernet_header;
     FILE *fp ;
 
     s = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
@@ -62,19 +63,26 @@ int main(int argc, char **argv){
     ioctl(s, SIOCSIFFLAGS, &ethreq);
 
     /*Buffer for ethernet frame*/
-    buffer = (unsigned char*)malloc(FRAME_LEN); 
+    ethhdr_len = sizeof(struct sniff_ethernet);
+    buffer = (unsigned char*)malloc(FRAME_LEN+ethhdr_len); 
     length = 0; 
     BindRawSocketToInterface(argv[1], s, ETH_P_ALL);
 
     while(1){
 
 //	length = recvfrom(s, buffer, FRAME_LEN, 0, NULL, NULL);
-	length = read(s, buffer, FRAME_LEN);
+/*    length = read(s, &ethernet_header, sizeof(struct ethhdr));
+    if(length!=14){
+        continue;
+        printf("Incorrect header\n");
+    }*/
+	length = read(s, buffer, FRAME_LEN + ethhdr_len);
 
-	if(length != FRAME_LEN)
+	if(length != FRAME_LEN+ethhdr_len)
 	    continue ;
 
-	header = (struct frame *)buffer ;
+    ethernet_header = (struct sniff_ethernet *)buffer ;
+	header = (struct frame *)(buffer + ethhdr_len );
 	printf("type %02x len %d\n", header->type, header->len) ;
 	if(header->type != 0x4e)
 	    continue ;
