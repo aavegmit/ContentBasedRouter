@@ -14,4 +14,4 @@ client.o: client.c
 	g++ -c -g client.c  -D_REETRANT -lpthread
 
 clean:
-	rm *.o server client
+	rm -f *.o server client
