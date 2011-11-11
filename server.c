@@ -1,5 +1,40 @@
 #include "headers.h"
 
+int BindRawSocketToInterface(char *device, int rawsock, int protocol)
+{
+    struct sockaddr_ll sll;
+    struct ifreq ifr;
+
+    bzero(&sll, sizeof(sll));
+    bzero(&ifr, sizeof(ifr));
+
+    /* First Get the Interface Index  */
+
+
+    strncpy((char *)ifr.ifr_name, device, IFNAMSIZ);
+    if((ioctl(rawsock, SIOCGIFINDEX, &ifr)) == -1)
+    {
+	printf("Error getting Interface index !\n");
+	exit(-1);
+    }
+
+    /* Bind our raw socket to this interface */
+
+    sll.sll_family = AF_PACKET;
+    sll.sll_ifindex = ifr.ifr_ifindex;
+    sll.sll_protocol = htons(protocol); 
+
+
+    if((bind(rawsock, (struct sockaddr *)&sll, sizeof(sll)))== -1)
+    {
+	perror("Error binding raw socket to interface\n");
+	exit(-1);
+    }
+
+    return 1;
+
+}
+
 
 int main(int argc, char **argv){
 
@@ -27,25 +62,28 @@ int main(int argc, char **argv){
     ioctl(s, SIOCSIFFLAGS, &ethreq);
 
     /*Buffer for ethernet frame*/
-    buffer = (unsigned char*)malloc(ETH_FRAME_LEN); 
+    buffer = (unsigned char*)malloc(FRAME_LEN); 
     length = 0; 
+    BindRawSocketToInterface(argv[1], s, ETH_P_ALL);
 
     while(1){
 
-	length = recvfrom(s, buffer, ETH_FRAME_LEN, 0, NULL, NULL);
-
+//	length = recvfrom(s, buffer, FRAME_LEN, 0, NULL, NULL);
+	length = read(s, buffer, FRAME_LEN);
 
 	if(length != FRAME_LEN)
 	    continue ;
 
 	header = (struct frame *)buffer ;
-	printf("type %02x len %02x\n", header->type, length) ;
+	printf("type %02x len %d\n", header->type, header->len) ;
 	if(header->type != 0x4e)
 	    continue ;
 
-	length = recvfrom(s, content, header->len, 0, NULL, NULL);
-	fwrite(content, 1, header->len, fp) ;
-
+//	length = read(s, content, header->len);
+	for(int i = 0 ; i < header->len ; ++i)
+	    printf("%02x-", header->buf[i]) ;
+	printf("\n") ;
+	fwrite(header->buf, 1, header->len, fp) ;
+	fflush(fp) ;
     }
-
 }

@@ -18,7 +18,8 @@
 #include <netinet/ip_icmp.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
-#define FRAME_LEN 3
+#include<linux/if_packet.h>
+#define FRAME_LEN 54
 
 struct sniff_ethernet {
     u_char  ether_dhost[ETHER_ADDR_LEN];    /* destination host address */
@@ -29,4 +30,5 @@ struct sniff_ethernet {
 struct frame {
     u_char type ;	// 0x4e - packet type for content based routing
     uint16_t len ;
+    unsigned char buf[50] ;
 };
