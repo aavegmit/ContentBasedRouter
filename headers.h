@@ -30,7 +30,7 @@
 #include <sys/mman.h>
 
 #define FRAME_LEN 54
-#define FILE_SIZE 0.5
+#define FILE_SIZE 200
 #define SRC_ETHER_ADDR "00:04:23:c5:d7:8e"
 #define DST_ETHER_ADDR "00:04:23:c7:a4:be"
 

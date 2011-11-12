@@ -53,13 +53,13 @@ int main(int argc, char **argv){
 	return NULL;
     }
 
-    fp = fopen(argv[2], "wb") ;
+    /*fp = fopen(argv[2], "wb") ;
     if(fp == NULL){
 	printf("Error opening the file to write\n") ;
-    }
+    }*/
 
     /* creating MMap to write into file */
-    //loadMMapForFile((unsigned char *)argv[2]);
+    loadMMapForFile((unsigned char *)argv[2]);
 
     /* set to promiscuous mode */
     strcpy(ethreq.ifr_name,argv[1]);
@@ -96,10 +96,10 @@ int main(int argc, char **argv){
 	/*for(int i = 0 ; i < header->len ; ++i)
 	    printf("%02x-", header->buf[i]) ;
 	printf("\n") ;*/
-	fwrite(header->buf, 1, header->len, fp) ;
-    //memcpy(&mapToFile[counter*(FRAME_LEN-4)], header->buf, header->len);
-    //counter++;
-    printf("Packet recvd: %ld\n", counter++);
-	fflush(fp) ;
+	//fwrite(header->buf, 1, header->len, fp) ;
+    memcpy(&mapToFile[counter*(FRAME_LEN-4)], header->buf, header->len);
+    counter++;
+//    printf("Packet recvd: %ld\n", counter++);
+	//fflush(fp) ;
     }
 }

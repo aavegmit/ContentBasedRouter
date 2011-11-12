@@ -108,7 +108,7 @@ int main(int argc, char **argv){
             perror("sendto");
         }
         usleep(100) ;
-        printf("Packet sent: %ld\n", counter++);
+        //printf("Packet sent: %ld\n", counter++);
         //memset(buffer, '\0', 100);
 
         //	if(write(sock,buffer,len ) < 0){
