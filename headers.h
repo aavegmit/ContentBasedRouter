@@ -1,3 +1,6 @@
+#ifndef _HEADERS_H
+#define _HEADERS_H
+
 #include <pthread.h>
 #include <list>
 #include <iostream>
@@ -20,7 +23,14 @@
 #include <net/if.h>
 #include<linux/if_packet.h>
 #include <netinet/ether.h>
+#include <sys/mman.h>
+#include <netdb.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+
 #define FRAME_LEN 54
+#define FILE_SIZE 0.5
 #define SRC_ETHER_ADDR "00:04:23:c5:d7:8e"
 #define DST_ETHER_ADDR "00:04:23:c7:a4:be"
 
@@ -31,7 +41,11 @@ struct sniff_ethernet {
 };
 
 struct frame {
+    u_char  ether_dhost[ETHER_ADDR_LEN];    /* destination host address */
+    u_char  ether_shost[ETHER_ADDR_LEN];    /* source host address */
+    u_short ether_type;                     /* IP? ARP? RARP? etc */
     u_char type ;	// 0x4e - packet type for content based routing
     uint16_t len ;
     unsigned char buf[50] ;
 };
+#endif

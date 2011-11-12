@@ -1,4 +1,5 @@
 #include "headers.h"
+#include "fileIO.h"
 
 int BindRawSocketToInterface(char *device, int rawsock, int protocol)
 {
@@ -44,6 +45,7 @@ int main(int argc, char **argv){
     struct frame *header ;
     struct sniff_ethernet *ethernet_header;
     FILE *fp ;
+    long int counter = 0;
 
     s = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if (s == -1) { 
@@ -55,6 +57,9 @@ int main(int argc, char **argv){
     if(fp == NULL){
 	printf("Error opening the file to write\n") ;
     }
+
+    /* creating MMap to write into file */
+    //loadMMapForFile((unsigned char *)argv[2]);
 
     /* set to promiscuous mode */
     strcpy(ethreq.ifr_name,argv[1]);
@@ -81,17 +86,20 @@ int main(int argc, char **argv){
 	if(length != FRAME_LEN+ethhdr_len)
 	    continue ;
 
-    ethernet_header = (struct sniff_ethernet *)buffer ;
-	header = (struct frame *)(buffer + ethhdr_len );
-	printf("type %02x len %d\n", header->type, header->len) ;
+    //ethernet_header = (struct sniff_ethernet *)buffer ;
+	header = (struct frame *)(buffer);
+	//printf("type %02x len %d\n", header->type, header->len) ;
 	if(header->type != 0x4e)
 	    continue ;
 
 //	length = read(s, content, header->len);
-	for(int i = 0 ; i < header->len ; ++i)
+	/*for(int i = 0 ; i < header->len ; ++i)
 	    printf("%02x-", header->buf[i]) ;
-	printf("\n") ;
+	printf("\n") ;*/
 	fwrite(header->buf, 1, header->len, fp) ;
+    //memcpy(&mapToFile[counter*(FRAME_LEN-4)], header->buf, header->len);
+    //counter++;
+    printf("Packet recvd: %ld\n", counter++);
 	fflush(fp) ;
     }
 }

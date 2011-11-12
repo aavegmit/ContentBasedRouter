@@ -36,30 +36,19 @@ int BindRawSocketToInterface(char *device, int rawsock, int protocol)
 
 }
 
-unsigned char* CreateEthernetHeader(char *src_mac, char *dst_mac, int protocol)
+void CreateEthernetHeader(struct frame *header, char *src_mac, char *dst_mac, int protocol)
 {
-    struct sniff_ethernet *ethernet_header;
-
-
-    ethernet_header = (struct sniff_ethernet *)malloc(sizeof(struct sniff_ethernet));
+    
+    //ethernet_header = (struct sniff_ethernet *)malloc(sizeof(struct sniff_ethernet));
 
     /* copy the Src mac addr */
-
-    memcpy(ethernet_header->ether_shost, (void *)ether_aton(src_mac), 6);
+    memcpy(header->ether_shost, (void *)ether_aton(src_mac), 6);
 
     /* copy the Dst mac addr */
-
-    memcpy(ethernet_header->ether_dhost, (void *)ether_aton(dst_mac), 6);
+    memcpy(header->ether_dhost, (void *)ether_aton(dst_mac), 6);
 
     /* copy the protocol */
-
-    ethernet_header->ether_type = htons(protocol);
-
-    /* done ...send the header back */
-
-    return ((unsigned char *)ethernet_header);
-
-
+    header->ether_type = htons(protocol);
 }
 
 
@@ -77,6 +66,7 @@ int main(int argc, char **argv){
     struct frame header ;
     FILE *fp;
     struct ifreq ethreq;
+    long int counter = 0;
 
     if(argc != 3)
         printf("Wrong number of arguments\n") ;
@@ -98,32 +88,32 @@ int main(int argc, char **argv){
     header.type = 0x4e ;
 
     BindRawSocketToInterface(argv[1], sock, ETH_P_ALL);
-    packet_header = CreateEthernetHeader(SRC_ETHER_ADDR, DST_ETHER_ADDR, ETHERTYPE_IP);
+    CreateEthernetHeader(&header, SRC_ETHER_ADDR, DST_ETHER_ADDR, ETH_P_ALL);
     ethhdr_len = sizeof(struct sniff_ethernet);
 
-
-    //    strcpy(sa.sa_data,interface) ;
     while(!feof(fp)){
         len = fread(header.buf, 1, 50, fp) ;
         header.len = len ;
 
-        printf("Sending %d bytes\n", len) ;
-        for(int i = 0 ; i < len ; ++i)
+        //printf("Sending %d bytes\n", len) ;
+        /*for(int i = 0 ; i < len ; ++i)
             printf("%02x-", header.buf[i]) ;
-        printf("\n") ;
+        printf("\n") ;*/
 
         /* Writing ethernet header first */
-        memcpy(buffer, packet_header, ethhdr_len);
-        memcpy(&buffer[ethhdr_len], &header, FRAME_LEN);
+        //memcpy(buffer, packet_header, ethhdr_len);
+        //memcpy(&buffer[ethhdr_len], &header, FRAME_LEN);
 
-        if(write(sock,&buffer,ethhdr_len+FRAME_LEN) < 0){
+        if(write(sock,&header,ethhdr_len+FRAME_LEN) < 0){
             perror("sendto");
         }
-        sleep(1) ;
-        memset(buffer, '\0', 100);
+        usleep(100) ;
+        printf("Packet sent: %ld\n", counter++);
+        //memset(buffer, '\0', 100);
 
         //	if(write(sock,buffer,len ) < 0){
         //	    perror("sendto");
         //	}
     }
+    printf("Finish sending data...\n");
 }
