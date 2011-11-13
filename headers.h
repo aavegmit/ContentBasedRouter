@@ -32,22 +32,22 @@
 #define FRAME_LEN 54
 #define FILE_SIZE 1024
 #define SRC_ETHER_ADDR "00:04:23:c5:d7:8e"
-#define DST_ETHER_ADDR "00:04:23:c7:a4:be"
+#define DST_ETHER_ADDR "00:11:43:d6:d6:18"
 
 #define INTERFACE_1 "eth0"
 #define INTERFACE_2 "eth1"
 #define INTERFACE_3 "eth2"
-#define INTERFACE_4 "eth4"
+#define INTERFACE_4 "eth3"
 
-#define RTR_ETHER_1 "00:0e:0c:68:a6:fa"
-#define RTR_ETHER_2 "00:04:23:ae:bf:92"
-#define RTR_ETHER_3 "00:04:23:ae:bf:93"
-#define RTR_ETHER_4 "00:11:43:d6:d6:18"
+#define RTR_ETHER_1 "00:04:23:c7:a6:0e"
+#define RTR_ETHER_2 "00:04:23:c7:a6:0f"
+#define RTR_ETHER_3 "00:04:23:c7:a6:22"
+#define RTR_ETHER_4 "00:04:23:c7:a6:23"
 
-#define NODE0_ETHER "00:04:23:ae:c8:5a"
-#define NODE1_ETHER "00:0e:0c:66:89:82"
-#define NODE2_ETHER "00:04:23:ae:d1:4c"
-#define NODE3_ETHER "00:04:23:ae:cc:32"
+#define NODE0_ETHER "00:04:23:c7:a8:0a"
+#define NODE1_ETHER "00:04:23:c5:d4:70"
+#define NODE2_ETHER "00:04:23:c7:a6:78"
+#define NODE3_ETHER "00:04:23:c7:a6:52"
 
 struct sniff_ethernet {
     u_char  ether_dhost[ETHER_ADDR_LEN];    /* destination host address */
@@ -61,6 +61,7 @@ struct frame {
     u_short ether_type;                     /* IP? ARP? RARP? etc */
     u_char type ;	// 0x4e - packet type for content based routing
     uint16_t len ;
-    unsigned char buf[50] ;
+    unsigned char buf[7] ;
 };
+void *sniffer(void *) ;
 #endif
