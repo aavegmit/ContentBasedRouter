@@ -1,6 +1,7 @@
 #include "fileIO.h"
 
 unsigned char *mapToFile;
+unsigned char *fileMap;
 // creating a mmap for writing to a file at the end
 int loadMMapForFile(unsigned char fileName[]){
 
@@ -58,3 +59,32 @@ int loadMMapForFile(unsigned char fileName[]){
 
     return fd;
 }
+
+//function to load file into global variable for MMAP...'fileMap'
+void loadFileToMMap(unsigned char fileName[]){
+
+    int fd;
+    int fileSize = FILE_SIZE*1024*1024;
+    struct stat fileStat;
+    //File name from Client through TCP
+    fd = open((char *)fileName, O_RDONLY);
+    if (fd == -1) {
+        perror("Error opening file for reading");
+        exit(EXIT_FAILURE);
+    }
+
+    if (fstat (fd, &fileStat) == -1) {
+        perror ("fstat");
+        exit(EXIT_FAILURE);
+    }
+
+    fileMap = (unsigned char *)mmap(0, fileSize, PROT_READ, MAP_SHARED, fd, 0);
+    //fileSize = sb.st_size;
+
+    if (fileMap == MAP_FAILED) {
+        close(fd);
+        perror("Error mmapping the file");
+        exit(EXIT_FAILURE);
+    }
+}
+

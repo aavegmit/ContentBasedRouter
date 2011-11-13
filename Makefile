@@ -4,8 +4,8 @@ all: ${TARGETS}
 server: server.o fileIO.o
 	g++ -o server server.o fileIO.o -D_REETRANT -lpthread
 
-client: client.o
-	g++ -o client client.o -D_REETRANT -lpthread
+client: client.o fileIO.o
+	g++ -o client client.o fileIO.o -D_REETRANT -lpthread
 
 server.o: server.c
 	g++ -c -g server.c  -D_REETRANT -lpthread

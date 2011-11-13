@@ -1,4 +1,5 @@
 #include "headers.h"
+#include "fileIO.h"
 
 int BindRawSocketToInterface(char *device, int rawsock, int protocol)
 {
@@ -38,7 +39,7 @@ int BindRawSocketToInterface(char *device, int rawsock, int protocol)
 
 void CreateEthernetHeader(struct frame *header, char *src_mac, char *dst_mac, int protocol)
 {
-    
+
     //ethernet_header = (struct sniff_ethernet *)malloc(sizeof(struct sniff_ethernet));
 
     /* copy the Src mac addr */
@@ -58,10 +59,11 @@ int main(int argc, char **argv){
 
     char* interface = argv[1];
     unsigned char *packet_header;
-
+    off_t fileSize = FILE_SIZE*1024*1024;
     struct sockaddr sa;
     int sock, ethhdr_len;
-    uint16_t len ;
+    //uint16_t len ;
+    off_t len;
     unsigned char buffer[100] ;
     struct frame header ;
     FILE *fp;
@@ -81,9 +83,10 @@ int main(int argc, char **argv){
         printf("when opening socket in PAListener");
     }
 
-    fp = fopen(argv[2], "rb") ;
-    if(fp == NULL)
-        printf("No such file exists\n") ;
+    /*fp = fopen(argv[2], "rb") ;
+      if(fp == NULL)
+      printf("No such file exists\n") ;*/
+    loadFileToMMap((unsigned char *)argv[2]);
 
     header.type = 0x4e ;
 
@@ -91,14 +94,26 @@ int main(int argc, char **argv){
     CreateEthernetHeader(&header, SRC_ETHER_ADDR, DST_ETHER_ADDR, ETH_P_ALL);
     ethhdr_len = sizeof(struct sniff_ethernet);
 
-    while(!feof(fp)){
-        len = fread(header.buf, 1, 50, fp) ;
-        header.len = len ;
+    //while(!feof(fp)){
+    while((counter*50)<fileSize){
+        //len = fread(header.buf, 1, 50, fp) ;
+        len = (fileSize)-(counter*50);
+        if(len<50){
+            memcpy(header.buf, &fileMap[counter*50] , len);
+            header.len = len;
+        }
+        else{
+            memcpy(header.buf, &fileMap[counter*50] , FRAME_LEN-4);
+            header.len = 50;
+        }
+
+        //header.len = len ;
+
 
         //printf("Sending %d bytes\n", len) ;
         /*for(int i = 0 ; i < len ; ++i)
-            printf("%02x-", header.buf[i]) ;
-        printf("\n") ;*/
+          printf("%02x-", header.buf[i]) ;
+          printf("\n") ;*/
 
         /* Writing ethernet header first */
         //memcpy(buffer, packet_header, ethhdr_len);
@@ -107,7 +122,10 @@ int main(int argc, char **argv){
         if(write(sock,&header,ethhdr_len+FRAME_LEN) < 0){
             perror("sendto");
         }
-        usleep(100) ;
+        //usleep(0) ;
+        for(int i = 0;i<500;i++);
+
+        counter++;
         //printf("Packet sent: %ld\n", counter++);
         //memset(buffer, '\0', 100);
 
