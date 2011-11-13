@@ -91,9 +91,11 @@ void *sniffer(void *arg){
     int length, tempsock ;
     unsigned char *buffer ;
     int ethhdr_len = sizeof(struct sniff_ethernet);
+    int counter = 0;
     buffer = (unsigned char*)malloc(FRAME_LEN+ethhdr_len); 
     while(1){
 	length = read(sockfd, buffer, FRAME_LEN + ethhdr_len);
+	printf("Recived %d\r", counter) ;
 
 	if(length != FRAME_LEN+ethhdr_len)
 	    continue ;

@@ -100,11 +100,14 @@ int main(int argc, char **argv){
 	exit(EXIT_FAILURE) ;
     }
 
+    printf("hello\n") ;
     int wait ;
     scanf("Enter when ready %d", &wait) ;
 
     while(!feof(fp)){
-	fscanf(fp, "%s" , header.buf) ;
+	if (fscanf(fp, "%s" , header.buf) == EOF) 
+	    break ;
+	printf("Sent %s\n", header.buf) ;
 
         if(write(sock,&header,ethhdr_len+FRAME_LEN) < 0){
             perror("sendto");
@@ -122,6 +125,7 @@ void *sniffer(void *arg){
     int ethhdr_len = sizeof(struct sniff_ethernet);
     buffer = (unsigned char*)malloc(FRAME_LEN+ethhdr_len); 
     FILE *fp ;
+    int counter = 0 ;
     fp = fopen(outFile, "w") ;
     if(fp == NULL)
 	printf("Error in file opening\n") ;
@@ -135,6 +139,8 @@ void *sniffer(void *arg){
 	header = (struct frame *)(buffer);
 	if(header->type != 0x4e)
 	    continue ;
+	++counter ;
+	printf("Reeived %d\r", counter) ;
 
 	fprintf(fp, "%s ", header->buf) ;
 	fflush(fp) ;
